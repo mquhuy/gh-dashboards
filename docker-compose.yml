@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: gh-notis-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    networks:
+      - app-network
+    environment:
+      - ALLOWED_ORIGIN=http://localhost:8899
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        BACKEND_URL: http://localhost:5000
+        GITHUB_USERNAME: mquhuy
+    container_name: gh-notis-frontend
+    ports:
+      - "8899:3000"
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
