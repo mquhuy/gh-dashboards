@@ -7,6 +7,7 @@ import { Button } from "@//components/ui/button"
 import { Switch } from "@//components/ui/switch"
 import { ScrollArea } from "@//components/ui/scroll-area"
 import { Pin, GitPullRequest, GitPullRequestClosed, GitMerge, CircleDot, ArrowLeft, UserCheck, Mail, MailOpen } from 'lucide-react'
+import usePersistentState from './usePersistentState';
 
 interface Notification {
   id: number;
@@ -24,9 +25,9 @@ interface Notification {
 
 export default function NotificationsManager() {
   const [notifications, setNotifications] = useState<Notification[]>([])
-  const [hideClosedMerged, setHideClosedMerged] = useState(false)
-  const [hideRead, setHideRead] = useState(false)
-  const [groupByRepo, setGroupByRepo] = useState(false)
+  const [hideClosedMerged, setHideClosedMerged] = usePersistentState('hideClosedMerged', false)
+  const [hideRead, setHideRead] = usePersistentState('hideRead', false)
+  const [groupByRepo, setGroupByRepo] = usePersistentState('groupByRepo', false)
   const [selectedItem, setSelectedItem] = useState<Notification | null>(null)
   const [loading, setLoading] = useState(true);
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL
