@@ -127,7 +127,9 @@ export default function NotificationsManager() {
 
   useEffect(() => {
     fetchNotifications();
-  }, []); // Empty dependency array means this runs once after the initial render
+    const intervalId = setInterval(fetchNotifications, 30000); // Fetch notifications every 30 seconds
+    return () => clearInterval(intervalId); // Cleanup interval on component unmount
+  }, []);
 
   const unmergedNotifications = notifications.filter(n =>
     !hideClosedMerged || (n.status !== 'merged' && n.status !== 'closed')
