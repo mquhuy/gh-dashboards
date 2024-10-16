@@ -109,12 +109,13 @@ export default function NotificationsManager() {
       if (!response.ok) {
         throw new Error('Failed to force pull notifications');
       }
-      alert('Notifications force pulled successfully');
+      fetchNotifications();
     } catch (error) {
       console.error('Error:', error);
-      alert('Error force pulling notifications');
     }
   };
+
+  const fetchNotifications = async () => {
     const response = await fetch(backendUrl+'/threads'); // Adjust this URL if needed
     if (!response.ok) {
       throw new Error('Network response was not ok');
