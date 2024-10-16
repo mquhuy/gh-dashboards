@@ -127,7 +127,7 @@ export default function NotificationsManager() {
 
   useEffect(() => {
     fetchNotifications();
-    const intervalId = setInterval(fetchNotifications, 30000); // Fetch notifications every 30 seconds
+    const intervalId = setInterval(fetchNotifications, 300000); // Fetch notifications every 5 minutes
     return () => clearInterval(intervalId); // Cleanup interval on component unmount
   }, []);
 
