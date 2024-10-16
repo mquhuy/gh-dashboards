@@ -98,7 +98,23 @@ export default function NotificationsManager() {
     setSelectedItem(null)
   }
 
-  const fetchNotifications = async () => {
+  const forcePull = async () => {
+    try {
+      const response = await fetch(backendUrl + '/forcePull', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to force pull notifications');
+      }
+      alert('Notifications force pulled successfully');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error force pulling notifications');
+    }
+  };
     const response = await fetch(backendUrl+'/threads'); // Adjust this URL if needed
     if (!response.ok) {
       throw new Error('Network response was not ok');
@@ -179,6 +195,9 @@ export default function NotificationsManager() {
         ) : (
           <>
             <div className="flex justify-between items-center mb-4">
+              <Button variant="primary" onClick={forcePull}>
+                Force Pull Notifications
+              </Button>
               <div className="flex items-center space-x-2">
                 <Switch
                   id="hide-closed-merged"
