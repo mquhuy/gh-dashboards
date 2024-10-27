@@ -13,6 +13,11 @@ type UpdateThreadRequest struct {
 	Action	 string	`json:"action"`
 }
 
+type UpdateSettingRequest struct {
+	Key string `json:"setting_key"`
+	Value string `json:"setting_value,omitempty"`
+}
+
 func getThreadsHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	log.Println("Serving all threads")
 	threads, err := getAllThreads(db)
@@ -77,4 +82,25 @@ func updateThreadHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		thread.Unread = !thread.Unread
 	}
 	updateThreadInDB(thread, db)
+}
+
+func updateSettingHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
+	var t UpdateSettingRequest
+	err := json.NewDecoder(r.Body).Decode(&t)
+	if err != nil {
+	    http.Error(w, err.Error(), http.StatusBadRequest)
+	    return
+	}
+	switch r.Method {
+	case http.MethodGet:
+		value, err := querySetting(db, t.Key)
+		if err != nil {
+			http.Error(w, "Error retrieving notifications", http.StatusInternalServerError)
+			return
+		}
+		t.Value = value
+		json.NewEncoder(w).Encode(t)
+	case http.MethodPost:
+		updateSettingValue(db, t.Key, t.Value)
+	}
 }

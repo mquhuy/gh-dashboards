@@ -18,10 +18,17 @@ func createTableIfNotExists(db *sql.DB, tableName string, schema string) {
 	}
 }
 
+func querySetting(db *sql.DB, settingKey string) (string, error) {
+	var settingValue string
+	err = db.QueryRow("SELECT value FROM settings WHERE key = $1", settingKey).Scan(&settingValue)
+	if err != nil {
+		return "", err
+	}
+	return settingValue, nil
+}
+
 func getLastUpdateTime(db *sql.DB) (*time.Time, error) {
-	// Query the single value
-	var lastUpdate string
-	err = db.QueryRow("SELECT value FROM settings WHERE key = $1", "last_update").Scan(&lastUpdate)
+	lastUpdate, err := querySetting(db, "last_update")
 	if err != nil {
 		return nil, err
 	}
@@ -29,10 +36,10 @@ func getLastUpdateTime(db *sql.DB) (*time.Time, error) {
 	return &lastUpdateTime, err
 }
 
-func updateLastUpdateTime(db *sql.DB, t string) error {
-	_, err := getLastUpdateTime(db)
+func updateSettingValue(db *sql.DB, key, value string) error {
+	_, err := querySetting(db, key)
 	if err == sql.ErrNoRows {
-		_, err1 := db.Exec("INSERT INTO settings (key, value) VALUES ($1, $2)", "last_update", t)
+		_, err1 := db.Exec("INSERT INTO settings (key, value) VALUES ($1, $2)", key, value)
 		if err1 != nil {
 			return err1
 		}
@@ -45,10 +52,14 @@ func updateLastUpdateTime(db *sql.DB, t string) error {
 		UPDATE settings
 		SET value = $1
 		WHERE key = $2`, 
-		t,
-		"last_update",
+		value,
+		key,
 	)
 	return err
+}
+
+func updateLastUpdateTime(db *sql.DB, t string) error {
+	return updateSettingValue(db, "last_update", t)
 }
 
 func queryThread(id int64, db *sql.DB) (*NotificationThread, error) {

@@ -113,6 +113,7 @@ func main() {
 
 	// API endpoints
 	http.HandleFunc("/threads", func(w http.ResponseWriter, r *http.Request) {
+		fetchAndProcessNotifications(ctx, client, db)
 		getThreadsHandler(w, r, db)
 	})
 
@@ -122,6 +123,14 @@ func main() {
 
 	http.HandleFunc("/updateThread", func(w http.ResponseWriter, r *http.Request) {
 		updateThreadHandler(w, r, db)
+	})
+
+	http.HandleFunc("/updateSetting", func(w http.ResponseWriter, r *http.Request) {
+		updateSettingHandler(w, r, db)
+	})
+
+	http.HandleFunc("/forcePull", func(w http.ResponseWriter, r *http.Request) {
+		fetchAndProcessNotifications(ctx, client, db)
 	})
 
 	fmt.Println("Server listening on port 5000")
@@ -272,6 +281,8 @@ func fetchAndProcessNotifications(ctx context.Context, client *github.Client, db
 				if !contains {
 					thread.Notifications = append(thread.Notifications, n)
 				}
+				thread.Status = threadStatus
+				thread.Unread = true
 				err = updateThreadInDB(thread, db)
 				if err != nil {
 					log.Println("Error updating thread:", err)
