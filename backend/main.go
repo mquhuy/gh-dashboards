@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"os"
 	"time"
-        "net/url"
-        "strings"
-        "strconv"
+  "net/url"
+  "strings"
+  "strconv"
 	"reflect"
 
 	"github.com/google/go-github/v55/github"
@@ -265,7 +265,7 @@ func fetchAndProcessNotifications(ctx context.Context, client *github.Client, db
 					Unread:		 true,
 					Notifications:   []Notification{n},
 				}
-				err = addThreadToDB(&thread, db)
+				err = addOrUpdateThreadToDB(&thread, db)
 				if err != nil {
 					log.Println("Error creating thread:", err)
 				}
@@ -283,7 +283,7 @@ func fetchAndProcessNotifications(ctx context.Context, client *github.Client, db
 				}
 				thread.Status = threadStatus
 				thread.Unread = true
-				err = updateThreadInDB(thread, db)
+				err = addOrUpdateThreadToDB(thread, db)
 				if err != nil {
 					log.Println("Error updating thread:", err)
 				}

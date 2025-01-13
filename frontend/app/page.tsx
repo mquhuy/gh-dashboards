@@ -109,6 +109,7 @@ export default function NotificationsManager() {
       if (!response.ok) {
         throw new Error('Failed to force pull notifications');
       }
+      setNotifications([])
       fetchNotifications();
     } catch (error) {
       console.error('Error:', error);

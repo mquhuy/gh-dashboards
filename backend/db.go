@@ -106,11 +106,23 @@ func getAllThreads(db *sql.DB) (*[]NotificationThread, error) {
 	return &threads, nil
 }
 
-func addThreadToDB(thread *NotificationThread, db *sql.DB) error {
+func addOrUpdateThreadToDB(thread *NotificationThread, db *sql.DB) error {
 	notificationsJson, _ := json.Marshal(thread.Notifications)
 	_, err = db.Exec(`
 		INSERT INTO threads (ID, Type, Repo, Title, Status, Pinned, Author, IsReviewRequest, URL, UpdatedAt, Unread, Notifications)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(ID) DO UPDATE SET
+      Type = EXCLUDED.Type,
+      Repo = EXCLUDED.Repo,
+      Title = EXCLUDED.Title,
+      Status = EXCLUDED.Status,
+      Pinned = EXCLUDED.Pinned,
+      Author = EXCLUDED.Author,
+      IsReviewRequest = EXCLUDED.IsReviewRequest,
+      URL = EXCLUDED.URL,
+      UpdatedAt = EXCLUDED.UpdatedAt,
+      Unread = EXCLUDED.Unread,
+      Notifications = EXCLUDED.Notifications`,
 		thread.ID,
 		thread.Type,
 		thread.Repo,
